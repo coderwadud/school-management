@@ -2,7 +2,7 @@ import Branch from "../models/BranchModel.js";
 import School from "../models/SchoolModel.js";
 export const createBranch = async (req, res) => {
   try {
-    const { name, branchCode, schoolId, address, status } = req.body;
+    const { name, branchCode, principalName, schoolId, address, status } = req.body;
     // Check if the school exists
     const school = await School.findById(schoolId);
     if (!school) {
@@ -11,6 +11,7 @@ export const createBranch = async (req, res) => {
     const newBranch = new Branch({
       name,
       branchCode,
+      principalName,
       schoolId,
       address,
       status,
@@ -44,7 +45,7 @@ export const getBranchById = async (req, res) => {
 };
 
 export const updateBranch = async (req, res) => {
-  try {    const { name, branchCode, schoolId, address, status } = req.body;
+  try {    const { name, branchCode, principalName, schoolId, address, status } = req.body;
     // Check if the school exists
     if (schoolId) { 
       const school = await School.findById(schoolId);
@@ -54,7 +55,7 @@ export const updateBranch = async (req, res) => {
     }
     const updatedBranch = await Branch.findByIdAndUpdate(
       req.params.id,
-      { name, branchCode, schoolId, address, status },
+      { name, branchCode, principalName, schoolId, address, status },
       { new: true }
     );
     if (!updatedBranch) {

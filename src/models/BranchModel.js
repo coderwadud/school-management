@@ -4,6 +4,7 @@ const branchSchema = new Schema({
     name: { type: String, required: true },
     branchCode: { type: String, required: true, unique: true },
     schoolId: { type: Schema.Types.ObjectId, ref: "School", required: true },
+    principalName: { type: String },
     address: {
         country: { type: String },
         city: { type: String },
