@@ -11,6 +11,7 @@ import shiftRoutes from "../routes/academic/ShiftRoute.js";
 import mediumRoutes from "../routes/academic/MediumRoute.js";
 import classRoutes from "../routes/academic/ClassRoute.js";
 import groupRoutes from "../routes/academic/GroupRoute.js";
+import teacherRoutes from "../routes/teacher/TeacherRoute.js";
 
 // Use routes
 router.use("/auth", authRoutes);
@@ -23,5 +24,5 @@ router.use("/shifts", shiftRoutes);
 router.use("/mediums", mediumRoutes);
 router.use("/classes", classRoutes);
 router.use("/groups", groupRoutes);
-
+router.use("/teachers", teacherRoutes);
 export default router;
