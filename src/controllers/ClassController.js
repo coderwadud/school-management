@@ -1,10 +1,9 @@
 import Class from "../models/ClassModel.js";
 import Branch from "../models/BranchModel.js";
-import Medium from "../models/MediumModel.js";
 import School from "../models/SchoolModel.js";
 export const createClass = async (req, res) => {
   try {
-    const { name, schoolId, branchId, mediumId, status } = req.body;
+    const { name, schoolId, branchId, status } = req.body;
     // Check if the school exists
     const school = await School.findById(schoolId);
     if (!school) {
@@ -15,16 +14,10 @@ export const createClass = async (req, res) => {
     if (!branch) {
       return res.status(404).json({ message: "Branch not found" });
     }
-    // Check if the medium exists
-    const medium = await Medium.findById(mediumId);
-    if (!medium) {
-      return res.status(404).json({ message: "Medium not found" });
-    }
     const newClass = new Class({
       name,
       schoolId,
         branchId,
-        mediumId,
         status,
     });
     const savedClass = await newClass.save();
@@ -36,7 +29,7 @@ export const createClass = async (req, res) => {
 
 export const getClasses = async (req, res) => {
   try {
-    const classes = await Class.find().populate("schoolId", "name").populate("branchId", "name").populate("mediumId", "name");
+    const classes = await Class.find().populate("schoolId", "name").populate("branchId", "name");
     res.status(200).json(classes);
   } catch (error) {
     res.status(500).json({ message: error.message });
@@ -45,7 +38,7 @@ export const getClasses = async (req, res) => {
 
 export const getClassById = async (req, res) => {
   try {
-    const classData = await Class.findById(req.params.id).populate("schoolId", "name").populate("branchId", "name").populate("mediumId", "name");
+    const classData = await Class.findById(req.params.id).populate("schoolId", "name").populate("branchId", "name");
     if (!classData) {
       return res.status(404).json({ message: "Class not found" });
     }
@@ -57,7 +50,7 @@ export const getClassById = async (req, res) => {
 
 export const updateClass = async (req, res) => {
   try {
-    const { name, schoolId, branchId, mediumId, status } = req.body;
+    const { name, schoolId, branchId, status } = req.body;
     // Check if the school exists
     if (schoolId) {
       const school = await School.findById(schoolId);
@@ -72,16 +65,9 @@ export const updateClass = async (req, res) => {
         return res.status(404).json({ message: "Branch not found" });
       }
     }
-    // Check if the medium exists
-    if (mediumId) {
-        const medium = await Medium.findById(mediumId);
-        if (!medium) {
-        return res.status(404).json({ message: "Medium not found" });
-      }
-    }
     const updatedClass = await Class.findByIdAndUpdate(
       req.params.id,
-      { name, schoolId, branchId, mediumId, status },
+      { name, schoolId, branchId, status },
       { new: true }
     );
     if (!updatedClass) {

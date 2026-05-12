@@ -14,16 +14,13 @@ const classSchema = new mongoose.Schema({
     ref: "Branch",
     required: true,
     },
-    mediumId: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: "Medium",
-    required: true,
-    },
     status: {
     type: Boolean,
     default: true,
   },
-});
+    createdAt: { type: Date, default: Date.now },
+    updatedAt: { type: Date, default: Date.now },
+}, { timestamps: true });
 
 const Class = mongoose.model("Class", classSchema);
 export default Class;

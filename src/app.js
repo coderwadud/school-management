@@ -17,6 +17,7 @@ import sessionRoutes from "./routes/SessionRoute.js";
 import shiftRoutes from "./routes/ShiftRoute.js";
 import mediumRoutes from "./routes/MediumRoute.js";
 import classRoutes from "./routes/ClassRoute.js";
+import groupRoutes from "./routes/GroupRoute.js";
 // Use routes
 app.use("/api/v1/auth", authRoutes);
 app.use("/api/blogposts", blogPostRoutes);
@@ -27,6 +28,7 @@ app.use("/api/v1/sessions", sessionRoutes);
 app.use("/api/v1/shifts", shiftRoutes);
 app.use("/api/v1/mediums", mediumRoutes);
 app.use("/api/v1/classes", classRoutes);
+app.use("/api/v1/groups", groupRoutes);
 // Connect to MongoDB
 connectDB();
 export default app;
