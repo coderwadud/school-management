@@ -1,6 +1,6 @@
-import Session from "../models/SessionModel.js";
-import School from "../models/SchoolModel.js";
-import Branch from "../models/BranchModel.js";
+import Session from "../../models/academic/SessionModel.js";
+import School from "../../models/academic/SchoolModel.js";
+import Branch from "../../models/academic/BranchModel.js";
 
 export const createSession = async (req, res) => {
     try {

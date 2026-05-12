@@ -1,4 +1,4 @@
-import {createGroup, getGroups, getGroupById, updateGroup, deleteGroup, toggleGroupStatus, getGroupsOptions } from "../controllers/GroupController.js";
+import {createGroup, getGroups, getGroupById, updateGroup, deleteGroup, toggleGroupStatus, getGroupsOptions } from "../../controllers/academic/GroupController.js";
 import express from "express";
 const router = express.Router();
 router.post("/", createGroup);

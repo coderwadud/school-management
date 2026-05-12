@@ -1,6 +1,6 @@
-import Class from "../models/ClassModel.js";
-import Branch from "../models/BranchModel.js";
-import School from "../models/SchoolModel.js";
+import Class from "../../models/academic/ClassModel.js";
+import Branch from "../../models/academic/BranchModel.js";
+import School from "../../models/academic/SchoolModel.js";
 export const createClass = async (req, res) => {
   try {
     const { name, schoolId, branchId, status } = req.body;

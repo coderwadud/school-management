@@ -1,4 +1,4 @@
-import { createSchool, getSchools, getSchoolById, getSchoolOptions, deleteSchool, updateSchool, getBranchesBySchoolId } from "../controllers/SchoolController.js";
+import { createSchool, getSchools, getSchoolById, getSchoolOptions, deleteSchool, updateSchool, getBranchesBySchoolId } from "../../controllers/academic/SchoolController.js";
 import express from "express";
 const router = express.Router();
 // POST /api/v1/schools

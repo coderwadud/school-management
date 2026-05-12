@@ -1,4 +1,4 @@
-import { createBranch, getBranches, getBranchById, updateBranch, deleteBranch, toggleBranchStatus, getBranchesOptions } from "../controllers/BranchController.js";
+import { createBranch, getBranches, getBranchById, updateBranch, deleteBranch, toggleBranchStatus, getBranchesOptions } from "../../controllers/academic/BranchController.js";
 import express from "express";
 const router = express.Router();
 // POST /api/v1/branches

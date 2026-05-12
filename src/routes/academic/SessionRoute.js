@@ -1,4 +1,4 @@
-import { createSession, updateSession, getSessions, getSessionById, deleteSession, getSessionsOptions, toggleSessionStatus } from "../controllers/SessionController.js";
+import { createSession, updateSession, getSessions, getSessionById, deleteSession, getSessionsOptions, toggleSessionStatus } from "../../controllers/academic/SessionController.js";
 import express from "express";
 
 const router = express.Router();

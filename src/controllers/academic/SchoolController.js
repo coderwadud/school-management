@@ -1,5 +1,5 @@
-import School from "../models/SchoolModel.js";
-import Branch from "../models/BranchModel.js";
+import School from "../../models/academic/SchoolModel.js";
+import Branch from "../../models/academic/BranchModel.js";
 export const createSchool = async (req, res) => {
   try {
     const { name, schoolCode, logo, email, phone, address, website } = req.body;

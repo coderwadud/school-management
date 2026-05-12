@@ -1,6 +1,6 @@
-import Shift from "../models/ShiftModel.js";
-import School from "../models/SchoolModel.js";
-import Branch from "../models/BranchModel.js";
+import Shift from "../../models/academic/ShiftModel.js";
+import School from "../../models/academic/SchoolModel.js";
+import Branch from "../../models/academic/BranchModel.js";
 export const createShift = async (req, res) => {
   try {
     const { name, startTime, endTime, schoolId, branchId, status } = req.body;

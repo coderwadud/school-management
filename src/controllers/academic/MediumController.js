@@ -1,6 +1,6 @@
-import Medium from "../models/MediumModel.js";
-import School from "../models/SchoolModel.js";
-import Branch from "../models/BranchModel.js";
+import Medium from "../../models/academic/MediumModel.js";
+import School from "../../models/academic/SchoolModel.js";
+import Branch from "../../models/academic/BranchModel.js";
 export const createMedium = async (req, res) => {
   try {
     const { name, schoolId, branchId, status } = req.body;

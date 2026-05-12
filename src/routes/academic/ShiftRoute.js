@@ -1,4 +1,4 @@
-import { createShift, getShifts, getShiftById, updateShift, deleteShift, toggleShiftStatus, getShiftsOptions } from "../controllers/ShiftController.js";
+import { createShift, getShifts, getShiftById, updateShift, deleteShift, toggleShiftStatus, getShiftsOptions } from "../../controllers/academic/ShiftController.js";
 import express from "express";
 
 const router = express.Router();

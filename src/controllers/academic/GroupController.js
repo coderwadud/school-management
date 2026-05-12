@@ -1,6 +1,6 @@
-import Group from "../models/GroupModel.js";
-import School from "../models/SchoolModel.js";
-import Branch from "../models/BranchModel.js";
+import Group from "../../models/academic/GroupModel.js";
+import School from "../../models/academic/SchoolModel.js";
+import Branch from "../../models/academic/BranchModel.js";
 export const createGroup = async (req, res) => {
   try {
     const { name, schoolId, branchId, status } = req.body;

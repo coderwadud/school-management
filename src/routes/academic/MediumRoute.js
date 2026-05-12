@@ -1,4 +1,4 @@
-import { createMedium, getMediums, getMediumById, updateMedium, deleteMedium, toggleMediumStatus, getMediumsOptions } from "../controllers/MediumController.js";
+import { createMedium, getMediums, getMediumById, updateMedium, deleteMedium, toggleMediumStatus, getMediumsOptions } from "../../controllers/academic/MediumController.js";
 import express from "express";
 
 const router = express.Router();
