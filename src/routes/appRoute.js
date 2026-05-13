@@ -12,6 +12,7 @@ import mediumRoutes from "../routes/academic/MediumRoute.js";
 import classRoutes from "../routes/academic/ClassRoute.js";
 import groupRoutes from "../routes/academic/GroupRoute.js";
 import teacherRoutes from "../routes/teacher/TeacherRoute.js";
+import sectionRoutes from "../routes/academic/SectionRoute.js";
 
 // Use routes
 router.use("/auth", authRoutes);
@@ -25,4 +26,5 @@ router.use("/mediums", mediumRoutes);
 router.use("/classes", classRoutes);
 router.use("/groups", groupRoutes);
 router.use("/teachers", teacherRoutes);
+router.use("/sections", sectionRoutes);
 export default router;
