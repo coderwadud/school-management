@@ -1,46 +1,19 @@
 import Section from "../../models/academic/SectionModel.js";
 import School from "../../models/academic/SchoolModel.js";
-import Class from "../../models/academic/ClassModel.js";
-import Group from "../../models/academic/GroupModel.js";
-import Medium from "../../models/academic/MediumModel.js";
-import Teacher from "../../models/teacher/TeacherModel.js";
 
 export const createSection = async (req, res) => {
   try {
     const schoolId = req.schoolId;
-    const { name, groupId, mediumId, teacherId, classId } = req.body;
+    const { name, status } = req.body;
     // Check if the school exists
     const school = await School.findById(schoolId);
     if (!school) {
       return res.status(404).json({ message: "School not found" });
     }
-    // Check if the class exists
-    const classObj = await Class.findById(classId);
-    if (!classObj) {
-      return res.status(404).json({ message: "Class not found" });
-    }
-    // Check if the group exists
-    const group = await Group.findById(groupId);
-    if (!group) {
-      return res.status(404).json({ message: "Group not found" });
-    }
-    // Check if the medium exists
-    const medium = await Medium.findById(mediumId);
-    if (!medium) {
-      return res.status(404).json({ message: "Medium not found" });
-    }
-    // Check if the teacher exists
-    const teacher = await Teacher.findById(teacherId);
-    if (!teacher) {
-      return res.status(404).json({ message: "Teacher not found" });
-    }
     const newSection = new Section({
       name,
+      status,
       schoolId,
-      groupId,
-      mediumId,
-      teacherId,
-      classId,
     });
     const savedSection = await newSection.save();
     res
@@ -53,12 +26,7 @@ export const createSection = async (req, res) => {
 
 export const getSections = async (req, res) => {
   try {
-    const sections = await Section.find()
-      .populate("schoolId", "name")
-      .populate("classId", "name")
-      .populate("groupId", "name")
-      .populate("mediumId", "name")
-      .populate("teacherId", "name");
+    const sections = await Section.find().populate("schoolId", "name");
     res.status(200).json(sections);
   } catch (error) {
     res.status(500).json({ message: error.message });
@@ -67,12 +35,10 @@ export const getSections = async (req, res) => {
 
 export const getSectionById = async (req, res) => {
   try {
-    const section = await Section.findById(req.params.id)
-      .populate("schoolId", "name")
-      .populate("classId", "name")
-      .populate("groupId", "name")
-      .populate("mediumId", "name")
-      .populate("teacherId", "name");
+    const section = await Section.findById(req.params.id).populate(
+      "schoolId",
+      "name",
+    );
     if (!section) {
       return res.status(404).json({ message: "Section not found" });
     }
@@ -85,7 +51,7 @@ export const getSectionById = async (req, res) => {
 export const updateSection = async (req, res) => {
   try {
     const schoolId = req.schoolId;
-    const { name, groupId, mediumId, teacherId, classId } = req.body;
+    const { name, status } = req.body;
     // Check if the school exists
     if (schoolId) {
       const school = await School.findById(schoolId);
@@ -93,37 +59,9 @@ export const updateSection = async (req, res) => {
         return res.status(404).json({ message: "School not found" });
       }
     }
-    // Check if the class exists
-    if (classId) {
-      const classObj = await Class.findById(classId);
-      if (!classObj) {
-        return res.status(404).json({ message: "Class not found" });
-      }
-    }
-    // Check if the group exists
-    if (groupId) {
-      const group = await Group.findById(groupId);
-      if (!group) {
-        return res.status(404).json({ message: "Group not found" });
-      }
-    }
-    // Check if the medium exists
-    if (mediumId) {
-      const medium = await Medium.findById(mediumId);
-      if (!medium) {
-        return res.status(404).json({ message: "Medium not found" });
-      }
-    }
-    // Check if the teacher exists
-    if (teacherId) {
-      const teacher = await Teacher.findById(teacherId);
-      if (!teacher) {
-        return res.status(404).json({ message: "Teacher not found" });
-      }
-    }
     const updatedSection = await Section.findByIdAndUpdate(
       req.params.id,
-      { name, schoolId, groupId, mediumId, teacherId, classId },
+      { name, status, schoolId },
       { new: true },
     );
     if (!updatedSection) {

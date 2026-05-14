@@ -13,26 +13,6 @@ const SectionSchema = new Schema(
       ref: "School",
       required: true,
     },
-    groupId: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: "Group",
-      required: true,
-    },
-    mediumId: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: "Medium",
-      required: true,
-    },
-    teacherId: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: "Teacher",
-      required: true,
-    },
-    classId: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: "Class",
-      required: true,
-    },
     status: {
       type: Boolean,
       default: true,
