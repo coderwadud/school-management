@@ -35,6 +35,7 @@ export const login = async (req, res) => {
       // Return success response with token
       return res.status(200).json({
         message: "Login successful",
+        data: {
         token,
         userType: "school",
         user: {
@@ -43,6 +44,7 @@ export const login = async (req, res) => {
           email: school.email,
           schoolCode: school.schoolCode,
         },
+        }
       });
     }
 

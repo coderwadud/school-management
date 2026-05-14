@@ -51,8 +51,20 @@ export const updateSession = async (req, res) => {
 
 export const getSessions = async (req, res) => {
   try {
-    const sessions = await Session.find().populate("schoolId", "name");
-    res.status(200).json(sessions);
+    const sessions = await Session.find()
+    const sessionData = sessions.map((session) => ({
+      id: session._id,
+      name: session.name,
+      startDate: session.startDate,
+      endDate: session.endDate,
+      status: session.status,
+      createdAt: session.createdAt,
+      updatedAt: session.updatedAt,
+    }));
+    res.status(200).json({
+      message: "Sessions retrieved successfully",
+      data: sessionData,
+    });
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
@@ -60,14 +72,24 @@ export const getSessions = async (req, res) => {
 
 export const getSessionById = async (req, res) => {
   try {
-    const session = await Session.findById(req.params.id).populate(
-      "schoolId",
-      "name",
-    );
+    const session = await Session.findById(req.params.id)
+     
     if (!session) {
       return res.status(404).json({ message: "Session not found" });
     }
-    res.status(200).json(session);
+     const sessionData = {
+      id: session._id,
+      name: session.name,
+      startDate: session.startDate,
+      endDate: session.endDate,
+      status: session.status,
+      createdAt: session.createdAt,
+      updatedAt: session.updatedAt,
+    };
+    res.status(200).json({
+      message: "Session retrieved successfully",
+      data: sessionData,
+    });
   } catch (error) {
     res.status(500).json({ message: error.message });
   }

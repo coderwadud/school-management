@@ -8,8 +8,6 @@ const sessionSchema = new Schema(
     startDate: { type: Date, required: true },
     endDate: { type: Date, required: true },
     status: { type: Boolean, default: true },
-    createdAt: { type: Date, default: Date.now },
-    updatedAt: { type: Date, default: Date.now },
   },
   { timestamps: true },
 );
