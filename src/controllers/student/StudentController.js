@@ -5,6 +5,7 @@ import Medium from "../../models/academic/MediumModel.js";
 import Class from "../../models/academic/ClassModel.js";
 import Group from "../../models/academic/GroupModel.js";
 import Section from "../../models/academic/SectionModel.js";
+import ClassWiseSubjects from "../../models/academic/ClassWiseSubjectsModel.js";
 
 export const createStudent = async (req, res) => {
     try {
@@ -100,6 +101,70 @@ export const createStudent = async (req, res) => {
 
         const savedStudent = await newStudent.save();
         res.status(201).json(savedStudent);
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+};
+
+// Get all students with their class and subject information
+export const getAllStudents = async (req, res) => {
+    try {
+        const students = await Student.find()
+            .populate("academicInformation.session", "name")
+            .populate("academicInformation.shift", "name")
+            .populate("academicInformation.medium", "name")
+            .populate("academicInformation.studentClass", "name")
+            .populate("academicInformation.group", "name")
+            .populate("academicInformation.section", "name");
+
+        // For each student, get their subjects based on their class
+        const studentsWithSubjects = await Promise.all(
+            students.map(async (student) => {
+                const classId = student.academicInformation.studentClass._id;
+                const classSubjects = await ClassWiseSubjects.findOne({ classId })
+                    .populate("subjectId", "name");
+                
+                return {
+                    ...student.toObject(),
+                    subjects: classSubjects ? classSubjects.subjectId : []
+                };
+            })
+        );
+
+        res.status(200).json(studentsWithSubjects);
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+};
+
+// Get a single student by ID with their class and subject information
+export const getStudentById = async (req, res) => {
+    try {
+        const { id } = req.params;
+        
+        const student = await Student.findById(id)
+            .populate("academicInformation.session", "name")
+            .populate("academicInformation.shift", "name")
+            .populate("academicInformation.medium", "name")
+            .populate("academicInformation.studentClass", "name")
+            .populate("academicInformation.group", "name")
+            .populate("academicInformation.section", "name");
+
+        if (!student) {
+            return res.status(404).json({ message: "Student not found" });
+        }
+
+        // Get subjects based on student's class
+        const classId = student.academicInformation.studentClass._id;
+        const classSubjects = await ClassWiseSubjects.findOne({ classId })
+            .populate("subjectId", "name");
+
+        const studentWithSubjects = {
+            ...student.toObject(),
+            subjects: classSubjects ? classSubjects.subjectId : []
+        };
+
+        res.status(200).json(studentWithSubjects);
     } catch (error) {
         res.status(500).json({ message: error.message });
     }
