@@ -1,24 +1,19 @@
 import Class from "../../models/academic/ClassModel.js";
-import Branch from "../../models/academic/BranchModel.js";
 import School from "../../models/academic/SchoolModel.js";
+
 export const createClass = async (req, res) => {
   try {
-    const { name, schoolId, branchId, status } = req.body;
+    const schoolId = req.schoolId;
+    const { name, status } = req.body;
     // Check if the school exists
     const school = await School.findById(schoolId);
     if (!school) {
       return res.status(404).json({ message: "School not found" });
     }
-    // Check if the branch exists
-    const branch = await Branch.findById(branchId);
-    if (!branch) {
-      return res.status(404).json({ message: "Branch not found" });
-    }
     const newClass = new Class({
       name,
       schoolId,
-        branchId,
-        status,
+      status,
     });
     const savedClass = await newClass.save();
     res.status(201).json(savedClass);
@@ -29,7 +24,7 @@ export const createClass = async (req, res) => {
 
 export const getClasses = async (req, res) => {
   try {
-    const classes = await Class.find().populate("schoolId", "name").populate("branchId", "name");
+    const classes = await Class.find().populate("schoolId", "name");
     res.status(200).json(classes);
   } catch (error) {
     res.status(500).json({ message: error.message });
@@ -38,7 +33,10 @@ export const getClasses = async (req, res) => {
 
 export const getClassById = async (req, res) => {
   try {
-    const classData = await Class.findById(req.params.id).populate("schoolId", "name").populate("branchId", "name");
+    const classData = await Class.findById(req.params.id).populate(
+      "schoolId",
+      "name",
+    );
     if (!classData) {
       return res.status(404).json({ message: "Class not found" });
     }
@@ -50,28 +48,22 @@ export const getClassById = async (req, res) => {
 
 export const updateClass = async (req, res) => {
   try {
-    const { name, schoolId, branchId, status } = req.body;
+    const schoolId = req.schoolId;
+    const { name, status } = req.body;
     // Check if the school exists
     if (schoolId) {
       const school = await School.findById(schoolId);
-        if (!school) {  
+      if (!school) {
         return res.status(404).json({ message: "School not found" });
-      }
-    }
-    // Check if the branch exists
-    if (branchId) { 
-        const branch = await Branch.findById(branchId);
-        if (!branch) {
-        return res.status(404).json({ message: "Branch not found" });
       }
     }
     const updatedClass = await Class.findByIdAndUpdate(
       req.params.id,
-      { name, schoolId, branchId, status },
-      { new: true }
+      { name, schoolId, status },
+      { new: true },
     );
     if (!updatedClass) {
-        return res.status(404).json({ message: "Class not found" });
+      return res.status(404).json({ message: "Class not found" });
     }
     res.status(200).json(updatedClass);
   } catch (error) {
@@ -80,19 +72,19 @@ export const updateClass = async (req, res) => {
 };
 
 export const deleteClass = async (req, res) => {
-    try {
+  try {
     const deletedClass = await Class.findByIdAndDelete(req.params.id);
     if (!deletedClass) {
       return res.status(404).json({ message: "Class not found" });
     }
     res.status(200).json({ message: "Class deleted successfully" });
-    } catch (error) {
+  } catch (error) {
     res.status(500).json({ message: error.message });
-    }
+  }
 };
 
 export const toggleClassStatus = async (req, res) => {
-    try {
+  try {
     const classData = await Class.findById(req.params.id);
     if (!classData) {
       return res.status(404).json({ message: "Class not found" });
@@ -100,9 +92,9 @@ export const toggleClassStatus = async (req, res) => {
     classData.status = !classData.status;
     const updatedClass = await classData.save();
     res.status(200).json(updatedClass);
-    } catch (error) {
+  } catch (error) {
     res.status(500).json({ message: error.message });
-    }
+  }
 };
 
 export const getClassesOptions = async (req, res) => {

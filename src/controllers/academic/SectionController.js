@@ -1,6 +1,5 @@
 import Section from "../../models/academic/SectionModel.js";
 import School from "../../models/academic/SchoolModel.js";
-import Branch from "../../models/academic/BranchModel.js";
 import Class from "../../models/academic/ClassModel.js";
 import Group from "../../models/academic/GroupModel.js";
 import Medium from "../../models/academic/MediumModel.js";
@@ -8,17 +7,12 @@ import Teacher from "../../models/teacher/TeacherModel.js";
 
 export const createSection = async (req, res) => {
   try {
-    const { name, schoolId, branchId, groupId, mediumId, teacherId, classId } =
-      req.body;
+    const schoolId = req.schoolId;
+    const { name, groupId, mediumId, teacherId, classId } = req.body;
     // Check if the school exists
     const school = await School.findById(schoolId);
     if (!school) {
       return res.status(404).json({ message: "School not found" });
-    }
-    // Check if the branch exists
-    const branch = await Branch.findById(branchId);
-    if (!branch) {
-      return res.status(404).json({ message: "Branch not found" });
     }
     // Check if the class exists
     const classObj = await Class.findById(classId);
@@ -43,7 +37,6 @@ export const createSection = async (req, res) => {
     const newSection = new Section({
       name,
       schoolId,
-      branchId,
       groupId,
       mediumId,
       teacherId,
@@ -62,7 +55,6 @@ export const getSections = async (req, res) => {
   try {
     const sections = await Section.find()
       .populate("schoolId", "name")
-      .populate("branchId", "name")
       .populate("classId", "name")
       .populate("groupId", "name")
       .populate("mediumId", "name")
@@ -77,7 +69,6 @@ export const getSectionById = async (req, res) => {
   try {
     const section = await Section.findById(req.params.id)
       .populate("schoolId", "name")
-      .populate("branchId", "name")
       .populate("classId", "name")
       .populate("groupId", "name")
       .populate("mediumId", "name")
@@ -93,20 +84,13 @@ export const getSectionById = async (req, res) => {
 
 export const updateSection = async (req, res) => {
   try {
-    const { name, schoolId, branchId, groupId, mediumId, teacherId, classId } =
-      req.body;
+    const schoolId = req.schoolId;
+    const { name, groupId, mediumId, teacherId, classId } = req.body;
     // Check if the school exists
     if (schoolId) {
       const school = await School.findById(schoolId);
       if (!school) {
         return res.status(404).json({ message: "School not found" });
-      }
-    }
-    // Check if the branch exists
-    if (branchId) {
-      const branch = await Branch.findById(branchId);
-      if (!branch) {
-        return res.status(404).json({ message: "Branch not found" });
       }
     }
     // Check if the class exists
@@ -139,7 +123,7 @@ export const updateSection = async (req, res) => {
     }
     const updatedSection = await Section.findByIdAndUpdate(
       req.params.id,
-      { name, schoolId, branchId, groupId, mediumId, teacherId, classId },
+      { name, schoolId, groupId, mediumId, teacherId, classId },
       { new: true },
     );
     if (!updatedSection) {

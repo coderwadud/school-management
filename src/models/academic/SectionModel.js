@@ -13,11 +13,6 @@ const SectionSchema = new Schema(
       ref: "School",
       required: true,
     },
-    branchId: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: "Branch",
-      required: true,
-    },
     groupId: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "Group",

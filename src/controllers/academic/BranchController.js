@@ -2,7 +2,8 @@ import Branch from "../../models/academic/BranchModel.js";
 import School from "../../models/academic/SchoolModel.js";
 export const createBranch = async (req, res) => {
   try {
-    const { name, branchCode, principalName, schoolId, address, status } = req.body;
+    const schoolId = req.schoolId;
+    const { name, branchCode, principalName, address, status } = req.body;
     // Check if the school exists
     const school = await School.findById(schoolId);
     if (!school) {
@@ -34,7 +35,10 @@ export const getBranches = async (req, res) => {
 
 export const getBranchById = async (req, res) => {
   try {
-    const branch = await Branch.findById(req.params.id).populate("schoolId", "name");
+    const branch = await Branch.findById(req.params.id).populate(
+      "schoolId",
+      "name",
+    );
     if (!branch) {
       return res.status(404).json({ message: "Branch not found" });
     }
@@ -45,9 +49,11 @@ export const getBranchById = async (req, res) => {
 };
 
 export const updateBranch = async (req, res) => {
-  try {    const { name, branchCode, principalName, schoolId, address, status } = req.body;
+  try {
+    const schoolId = req.schoolId;
+    const { name, branchCode, principalName, address, status } = req.body;
     // Check if the school exists
-    if (schoolId) { 
+    if (schoolId) {
       const school = await School.findById(schoolId);
       if (!school) {
         return res.status(404).json({ message: "School not found" });
@@ -56,7 +62,7 @@ export const updateBranch = async (req, res) => {
     const updatedBranch = await Branch.findByIdAndUpdate(
       req.params.id,
       { name, branchCode, principalName, schoolId, address, status },
-      { new: true }
+      { new: true },
     );
     if (!updatedBranch) {
       return res.status(404).json({ message: "Branch not found" });

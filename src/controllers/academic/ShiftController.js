@@ -1,25 +1,20 @@
 import Shift from "../../models/academic/ShiftModel.js";
 import School from "../../models/academic/SchoolModel.js";
-import Branch from "../../models/academic/BranchModel.js";
+
 export const createShift = async (req, res) => {
   try {
-    const { name, startTime, endTime, schoolId, branchId, status } = req.body;
+    const schoolId = req.schoolId;
+    const { name, startTime, endTime, status } = req.body;
     // Check if the school exists
     const school = await School.findById(schoolId);
     if (!school) {
       return res.status(404).json({ message: "School not found" });
-    }
-    // Check if the branch exists
-    const branch = await Branch.findById(branchId);
-    if (!branch) {
-      return res.status(404).json({ message: "Branch not found" });
     }
     const newShift = new Shift({
       name,
       startTime,
       endTime,
       schoolId,
-      branchId,
       status,
     });
     const savedShift = await newShift.save();
@@ -31,9 +26,7 @@ export const createShift = async (req, res) => {
 
 export const getShifts = async (req, res) => {
   try {
-    const shifts = await Shift.find()
-      .populate("schoolId", "name")
-      .populate("branchId", "name");
+    const shifts = await Shift.find().populate("schoolId", "name");
     res.status(200).json(shifts);
   } catch (error) {
     res.status(500).json({ message: error.message });
@@ -42,9 +35,10 @@ export const getShifts = async (req, res) => {
 
 export const getShiftById = async (req, res) => {
   try {
-    const shift = await Shift.findById(req.params.id)
-      .populate("schoolId", "name")
-      .populate("branchId", "name");
+    const shift = await Shift.findById(req.params.id).populate(
+      "schoolId",
+      "name",
+    );
     if (!shift) {
       return res.status(404).json({ message: "Shift not found" });
     }
@@ -56,7 +50,8 @@ export const getShiftById = async (req, res) => {
 
 export const updateShift = async (req, res) => {
   try {
-    const { name, startTime, endTime, schoolId, branchId, status } = req.body;
+    const schoolId = req.schoolId;
+    const { name, startTime, endTime, status } = req.body;
     // Check if the school exists
     if (schoolId) {
       const school = await School.findById(schoolId);
@@ -64,16 +59,9 @@ export const updateShift = async (req, res) => {
         return res.status(404).json({ message: "School not found" });
       }
     }
-    // Check if the branch exists
-    if (branchId) {
-      const branch = await Branch.findById(branchId);
-      if (!branch) {
-        return res.status(404).json({ message: "Branch not found" });
-      }
-    }
     const updatedShift = await Shift.findByIdAndUpdate(
       req.params.id,
-      { name, startTime, endTime, schoolId, branchId, status },
+      { name, startTime, endTime, schoolId, status },
       { new: true },
     );
     if (!updatedShift) {
