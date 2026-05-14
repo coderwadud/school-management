@@ -13,6 +13,7 @@ import groupRoutes from "../routes/academic/GroupRoute.js";
 import teacherRoutes from "../routes/teacher/TeacherRoute.js";
 import sectionRoutes from "../routes/academic/SectionRoute.js";
 import subjectRoutes from "../routes/academic/SubjectRoute.js";
+import studentRoutes from "../routes/student/studentRoute.js";
 
 // Use routes
 router.use("/auth", authRoutes);
@@ -26,4 +27,6 @@ router.use("/groups", groupRoutes);
 router.use("/teachers", teacherRoutes);
 router.use("/sections", sectionRoutes);
 router.use("/subjects", subjectRoutes);
+router.use("/students", studentRoutes);
+
 export default router;
