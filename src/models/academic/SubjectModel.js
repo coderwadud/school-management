@@ -1,12 +1,20 @@
-import { text } from "express";
 import mongoose from "mongoose";
-const Schema = mongoose.Schema;
-
-const SectionSchema = new Schema(
+const subjectSchema = new mongoose.Schema(
   {
     name: {
       type: String,
       required: true,
+    },
+    shortName: {
+      type: String,
+    },
+    subjectCode: {
+      type: String,
+      unique: true,
+    },
+    practicalSubject: {
+      type: Boolean,
+      default: false,
     },
     schoolId: {
       type: mongoose.Schema.Types.ObjectId,
@@ -23,5 +31,5 @@ const SectionSchema = new Schema(
   { timestamps: true },
 );
 
-const Section = mongoose.model("Section", SectionSchema);
-export default Section;
+const Subject = mongoose.model("Subject", subjectSchema);
+export default Subject;

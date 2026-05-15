@@ -1,35 +1,34 @@
 import School from "../../models/academic/SchoolModel.js";
-import Branch from "../../models/academic/BranchModel.js";
 import Teacher from "../../models/teacher/TeacherModel.js";
 import bcrypt from "bcrypt";
+
 // Create a new teacher
 export const createTeacher = async (req, res) => {
-  try {    
+  try {
     const {
-    name,
-    schoolId,
-    branchId,
-    email,
-    phone,
-    nid,
-    bloodGroup,
-    image,
-    password,
-    designation,
-    educationQualification,
-    joiningDate,
-    dateOfBirth,
-    address,
-    salary,
-    gender,
-    religion,
-    maritalStatus,
-  } = req.body;
+      name,
+      email,
+      phone,
+      nid,
+      bloodGroup,
+      image,
+      password,
+      designation,
+      educationQualification,
+      joiningDate,
+      dateOfBirth,
+      address,
+      salary,
+      gender,
+      religion,
+      maritalStatus,
+    } = req.body;
+    const schoolId = req.schoolId; // Get schoolId from authenticated user
 
     // Validate required fields
-    if (!name || !schoolId || !branchId || !email || !phone || !nid || !password) {
+    if (!name || !schoolId || !email || !phone || !nid || !password) {
       return res.status(400).json({
-        message: "Name, School ID, Branch ID, Email, Phone, NID and Password are required",
+        message: "Name, School ID, Email, Phone, NID and Password are required",
       });
     }
 
@@ -39,16 +38,12 @@ export const createTeacher = async (req, res) => {
       return res.status(404).json({ message: "School not found" });
     }
 
-    // Check if the branch exists
-    const branch = await Branch.findById(branchId);
-    if (!branch) {
-      return res.status(404).json({ message: "Branch not found" });
-    }
-
     // Check if the teacher already exists
     const existingTeacher = await Teacher.findOne({ email });
     if (existingTeacher) {
-      return res.status(409).json({ message: "Teacher with this email already exists" });
+      return res
+        .status(409)
+        .json({ message: "Teacher with this email already exists" });
     }
 
     // Hash the password
@@ -58,7 +53,6 @@ export const createTeacher = async (req, res) => {
     const newTeacher = new Teacher({
       name,
       schoolId,
-      branchId,
       email,
       phone,
       nid,
@@ -78,32 +72,45 @@ export const createTeacher = async (req, res) => {
 
     await newTeacher.save();
 
-    res.status(201).json({ message: "Teacher created successfully", teacher: newTeacher });
+    res
+      .status(201)
+      .json({ message: "Teacher created successfully", teacher: newTeacher });
   } catch (error) {
-    res.status(500).json({ message: "Internal server error", error: error.message });
+    res
+      .status(500)
+      .json({ message: "Internal server error", error: error.message });
   }
 };
 
 // Get all teachers
 export const getAllTeachers = async (req, res) => {
   try {
-    const teachers = await Teacher.find().populate("schoolId").populate("branchId");
-    res.status(200).json({ message: "Teachers retrieved successfully", teachers });
+    const teachers = await Teacher.find().populate("schoolId");
+    res
+      .status(200)
+      .json({ message: "Teachers retrieved successfully", teachers });
   } catch (error) {
-    res.status(500).json({ message: "Internal server error", error: error.message });
+    res
+      .status(500)
+      .json({ message: "Internal server error", error: error.message });
   }
 };
 
 // Get a teacher by ID
 export const getTeacherById = async (req, res) => {
-  try {    const { id } = req.params;
-    const teacher = await Teacher.findById(id).populate("schoolId").populate("branchId");
+  try {
+    const { id } = req.params;
+    const teacher = await Teacher.findById(id).populate("schoolId");
     if (!teacher) {
       return res.status(404).json({ message: "Teacher not found" });
     }
-    res.status(200).json({ message: "Teacher retrieved successfully", teacher });
+    res
+      .status(200)
+      .json({ message: "Teacher retrieved successfully", teacher });
   } catch (error) {
-    res.status(500).json({ message: "Internal server error", error: error.message });
+    res
+      .status(500)
+      .json({ message: "Internal server error", error: error.message });
   }
 };
 
@@ -120,24 +127,34 @@ export const updateTeacher = async (req, res) => {
     }
 
     // Check if email is being updated and if it's already taken by another teacher
-    if (updateData.email && updateData.email.toLowerCase() !== teacher.email.toLowerCase()) {
-      const existingTeacherWithEmail = await Teacher.findOne({ 
+    if (
+      updateData.email &&
+      updateData.email.toLowerCase() !== teacher.email.toLowerCase()
+    ) {
+      const existingTeacherWithEmail = await Teacher.findOne({
         email: updateData.email,
-        _id: { $ne: id }
+        _id: { $ne: id },
       });
       if (existingTeacherWithEmail) {
-        return res.status(409).json({ message: "Email is already in use by another teacher" });
+        return res
+          .status(409)
+          .json({ message: "Email is already in use by another teacher" });
       }
     }
 
     // Check if NID is being updated and if it's already taken by another teacher
-    if (updateData.nid && updateData.nid.toString() !== teacher.nid.toString()) {
-      const existingTeacherWithNID = await Teacher.findOne({ 
+    if (
+      updateData.nid &&
+      updateData.nid.toString() !== teacher.nid.toString()
+    ) {
+      const existingTeacherWithNID = await Teacher.findOne({
         nid: updateData.nid,
-        _id: { $ne: id }
+        _id: { $ne: id },
       });
       if (existingTeacherWithNID) {
-        return res.status(409).json({ message: "NID is already in use by another teacher" });
+        return res
+          .status(409)
+          .json({ message: "NID is already in use by another teacher" });
       }
     }
 
@@ -155,7 +172,9 @@ export const updateTeacher = async (req, res) => {
 
     res.status(200).json({ message: "Teacher updated successfully", teacher });
   } catch (error) {
-    res.status(500).json({ message: "Internal server error", error: error.message });
+    res
+      .status(500)
+      .json({ message: "Internal server error", error: error.message });
   }
 };
 
@@ -168,37 +187,46 @@ export const deleteTeacher = async (req, res) => {
       return res.status(404).json({ message: "Teacher not found" });
     }
     res.status(200).json({ message: "Teacher deleted successfully" });
-    } catch (error) {
-    res.status(500).json({ message: "Internal server error", error: error.message });
+  } catch (error) {
+    res
+      .status(500)
+      .json({ message: "Internal server error", error: error.message });
   }
 };
 
 // teacher status toggle
 export const toggleTeacherStatus = async (req, res) => {
-  try {    const { id } = req.params;
+  try {
+    const { id } = req.params;
     const teacher = await Teacher.findById(id);
     if (!teacher) {
-        return res.status(404).json({ message: "Teacher not found" });
+      return res.status(404).json({ message: "Teacher not found" });
     }
     // Toggle the teacher status
     teacher.status = !teacher.status;
     await teacher.save();
-    res.status(200).json({ message: "Teacher status toggled successfully", teacher });
-    } catch (error) {
-    res.status(500).json({ message: "Internal server error", error: error.message });
+    res
+      .status(200)
+      .json({ message: "Teacher status toggled successfully", teacher });
+  } catch (error) {
+    res
+      .status(500)
+      .json({ message: "Internal server error", error: error.message });
   }
 };
 
 // Teacher options
 export const getTeacherOptions = async (req, res) => {
-    try {
-        const teachers = await Teacher.find({ status: true }).select("name _id");
-        const options = teachers.map((teacher) => ({
-            label: teacher.name,
-            value: teacher._id,
-        }));
-        res.status(200).json(options);
-    } catch (error) {
-        res.status(500).json({ message: "Internal server error", error: error.message });
-    }
-}
+  try {
+    const teachers = await Teacher.find({ status: true }).select("name _id");
+    const options = teachers.map((teacher) => ({
+      label: teacher.name,
+      value: teacher._id,
+    }));
+    res.status(200).json(options);
+  } catch (error) {
+    res
+      .status(500)
+      .json({ message: "Internal server error", error: error.message });
+  }
+};

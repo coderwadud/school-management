@@ -8,12 +8,19 @@ import {
   toggleSectionStatus,
 } from "../../controllers/academic/SectionController.js";
 import express from "express";
+import { authenticate } from "../../middleware/authMiddleware.js";
+
 const router = express.Router();
-router.post("/", createSection);
+
+// Public routes
 router.get("/", getSections);
 router.get("/options", getSectionsOptions);
 router.get("/:id", getSectionById);
-router.put("/:id", updateSection);
-router.delete("/:id", deleteSection);
-router.patch("/:id/status", toggleSectionStatus);
+
+// Protected routes (requires authentication)
+router.post("/", authenticate, createSection);
+router.put("/:id", authenticate, updateSection);
+router.delete("/:id", authenticate, deleteSection);
+router.patch("/:id/status", authenticate, toggleSectionStatus);
+
 export default router;
