@@ -11,7 +11,6 @@ export const createTeacher = async (req, res) => {
       phone,
       nid,
       bloodGroup,
-      image,
       password,
       designation,
       educationQualification,
@@ -24,6 +23,7 @@ export const createTeacher = async (req, res) => {
       maritalStatus,
     } = req.body;
     const schoolId = req.schoolId; // Get schoolId from authenticated user
+    const image = req.files?.image?.[0]?.path || null;
 
     // Validate required fields
     if (!name || !schoolId || !email || !phone || !nid || !password) {
@@ -118,12 +118,54 @@ export const getTeacherById = async (req, res) => {
 export const updateTeacher = async (req, res) => {
   try {
     const { id } = req.params;
-    const updateData = req.body;
+
+    const {
+      name,
+      email,
+      phone,
+      nid,
+      bloodGroup,
+      password,
+      designation,
+      educationQualification,
+      joiningDate,
+      dateOfBirth,
+      address,
+      salary,
+      gender,
+      religion,
+      maritalStatus,
+    } = req.body;
+    const schoolId = req.schoolId; // Get schoolId from authenticated user
+    const image = req.files?.image?.[0]?.path || null;
 
     // Check if the teacher exists
     const teacher = await Teacher.findById(id);
     if (!teacher) {
       return res.status(404).json({ message: "Teacher not found" });
+    }
+
+    // Prepare update data
+    const updateData = {
+      name,
+      email,
+      phone,
+      nid,
+      bloodGroup,
+      designation,
+      educationQualification,
+      joiningDate,
+      dateOfBirth,
+      address,
+      salary,
+      gender,
+      religion,
+      maritalStatus,
+    };
+
+    // Add image to update data if provided
+    if (image) {
+      updateData.image = image;
     }
 
     // Check if email is being updated and if it's already taken by another teacher
@@ -159,8 +201,8 @@ export const updateTeacher = async (req, res) => {
     }
 
     // Hash password if it's being updated
-    if (updateData.password) {
-      updateData.password = await bcrypt.hash(updateData.password, 10);
+    if (password) {
+      updateData.password = await bcrypt.hash(password, 10);
     }
 
     // Update the updatedAt timestamp
