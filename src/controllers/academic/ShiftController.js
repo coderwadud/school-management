@@ -26,8 +26,18 @@ export const createShift = async (req, res) => {
 
 export const getShifts = async (req, res) => {
   try {
-    const shifts = await Shift.find().populate("schoolId", "name");
-    res.status(200).json(shifts);
+    const shifts = await Shift.find();
+    const shiftData = shifts.map((shift) => ({
+      id: shift._id.toString(),
+      name: shift.name,
+      startTime: shift.startTime,
+      endTime: shift.endTime,
+      status: shift.status,
+    }));
+    res.status(200).json({
+      message: "Shifts retrieved successfully",
+      data: shiftData,
+    });
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
@@ -35,14 +45,20 @@ export const getShifts = async (req, res) => {
 
 export const getShiftById = async (req, res) => {
   try {
-    const shift = await Shift.findById(req.params.id).populate(
-      "schoolId",
-      "name",
-    );
+    const shift = await Shift.findById(req.params.id);
     if (!shift) {
       return res.status(404).json({ message: "Shift not found" });
     }
-    res.status(200).json(shift);
+    res.status(200).json({
+      message: "Shift retrieved successfully",
+      data: {
+        id: shift._id.toString(),
+        name: shift.name,
+        startTime: shift.startTime,
+        endTime: shift.endTime,
+        status: shift.status,
+      },
+    });
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
@@ -67,7 +83,16 @@ export const updateShift = async (req, res) => {
     if (!updatedShift) {
       return res.status(404).json({ message: "Shift not found" });
     }
-    res.status(200).json(updatedShift);
+    res.status(200).json({
+      message: "Shift updated successfully",
+      data: {
+        id: updatedShift._id.toString(),
+        name: updatedShift.name,
+        startTime: updatedShift.startTime,
+        endTime: updatedShift.endTime,
+        status: updatedShift.status,
+      },
+    });
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
@@ -93,7 +118,12 @@ export const toggleShiftStatus = async (req, res) => {
     }
     shift.status = !shift.status;
     const updatedShift = await shift.save();
-    res.status(200).json(updatedShift);
+    res.status(200).json({
+      message: "Shift status toggled successfully",
+      data: {
+        status: updatedShift.status,
+      },
+    });
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
@@ -104,7 +134,7 @@ export const getShiftsOptions = async (req, res) => {
     const shifts = await Shift.find({ status: true }).select("name _id");
     const options = shifts.map((shift) => ({
       label: shift.name,
-      value: shift._id,
+      value: shift._id.toString(),
     }));
     res.status(200).json(options);
   } catch (error) {
