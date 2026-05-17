@@ -4,7 +4,7 @@ import School from "../../models/academic/SchoolModel.js";
 export const createSection = async (req, res) => {
   try {
     const schoolId = req.schoolId;
-    const { name, status } = req.body;
+    const { name, description, status } = req.body;
     // Check if the school exists
     const school = await School.findById(schoolId);
     if (!school) {
@@ -12,6 +12,7 @@ export const createSection = async (req, res) => {
     }
     const newSection = new Section({
       name,
+      description,
       status,
       schoolId,
     });
@@ -26,8 +27,19 @@ export const createSection = async (req, res) => {
 
 export const getSections = async (req, res) => {
   try {
-    const sections = await Section.find().populate("schoolId", "name");
-    res.status(200).json(sections);
+    const sections = await Section.find();
+    const sectionData = sections.map((section) => ({
+      id: section._id,
+      name: section.name,
+      description: section.description,
+      status: section.status,
+    }));
+    res.status(200).json(
+      {
+        message: "Sections retrieved successfully",
+        data: sectionData,
+      }
+    );
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
@@ -35,14 +47,20 @@ export const getSections = async (req, res) => {
 
 export const getSectionById = async (req, res) => {
   try {
-    const section = await Section.findById(req.params.id).populate(
-      "schoolId",
-      "name",
-    );
+    const section = await Section.findById(req.params.id)
+    const responseData = {
+      id: section._id,
+      name: section.name,
+      description: section.description,
+      status: section.status,
+    };
     if (!section) {
       return res.status(404).json({ message: "Section not found" });
     }
-    res.status(200).json(section);
+    res.status(200).json({
+      message: "Section retrieved successfully",
+      data: responseData,
+    });
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
@@ -51,7 +69,7 @@ export const getSectionById = async (req, res) => {
 export const updateSection = async (req, res) => {
   try {
     const schoolId = req.schoolId;
-    const { name, status } = req.body;
+    const { name, description, status } = req.body;
     // Check if the school exists
     if (schoolId) {
       const school = await School.findById(schoolId);
@@ -61,13 +79,18 @@ export const updateSection = async (req, res) => {
     }
     const updatedSection = await Section.findByIdAndUpdate(
       req.params.id,
-      { name, status, schoolId },
+      { name, description, status, schoolId },
       { new: true },
     );
     if (!updatedSection) {
       return res.status(404).json({ message: "Section not found" });
     }
-    res.status(200).json(updatedSection);
+    res.status(200).json(
+      {
+        message: "Section updated successfully",
+        data: updatedSection,
+      }
+    );
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
