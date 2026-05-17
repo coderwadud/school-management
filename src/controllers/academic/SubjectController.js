@@ -19,7 +19,12 @@ export const createSubject = async (req, res) => {
       status,
     });
     const savedSubject = await newSubject.save();
-    res.status(201).json(savedSubject);
+    res.status(201).json(
+      {
+        message: "Subject created successfully",
+        data: savedSubject,
+      }
+    );
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
@@ -27,8 +32,21 @@ export const createSubject = async (req, res) => {
 
 export const getSubjects = async (req, res) => {
   try {
-    const subjects = await Subject.find().populate("schoolId", "name");
-    res.status(200).json(subjects);
+    const subjects = await Subject.find();
+    const subjectData = subjects.map((subject) => ({
+      id: subject._id,
+      name: subject.name,
+      shortName: subject.shortName,
+      subjectCode: subject.subjectCode,
+      practicalSubject: subject.practicalSubject,
+      status: subject.status,
+    }));
+    res.status(200).json(
+      {
+        message: "Subjects retrieved successfully",
+        data: subjectData,
+      }
+    );
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
@@ -36,14 +54,22 @@ export const getSubjects = async (req, res) => {
 
 export const getSubjectById = async (req, res) => {
   try {
-    const subject = await Subject.findById(req.params.id).populate(
-      "schoolId",
-      "name",
-    );
+    const subject = await Subject.findById(req.params.id);
     if (!subject) {
       return res.status(404).json({ message: "Subject not found" });
     }
-    res.status(200).json(subject);
+    const responseData = {
+      id: subject._id,
+      name: subject.name,
+      shortName: subject.shortName,
+      subjectCode: subject.subjectCode,
+      practicalSubject: subject.practicalSubject,
+      status: subject.status,
+    };
+    res.status(200).json({
+      message: "Subject retrieved successfully",
+      data: responseData,
+    });
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
@@ -68,7 +94,10 @@ export const updateSubject = async (req, res) => {
     if (!updatedSubject) {
       return res.status(404).json({ message: "Subject not found" });
     }
-    res.status(200).json(updatedSubject);
+    res.status(200).json({
+      message: "Subject updated successfully",
+      data: updatedSubject,
+    });
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
