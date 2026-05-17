@@ -4,7 +4,7 @@ import School from "../../models/academic/SchoolModel.js";
 export const createClass = async (req, res) => {
   try {
     const schoolId = req.schoolId;
-    const { name, status } = req.body;
+    const { name, description, status } = req.body;
     // Check if the school exists
     const school = await School.findById(schoolId);
     if (!school) {
@@ -12,6 +12,7 @@ export const createClass = async (req, res) => {
     }
     const newClass = new Class({
       name,
+      description,
       schoolId,
       status,
     });
@@ -24,8 +25,17 @@ export const createClass = async (req, res) => {
 
 export const getClasses = async (req, res) => {
   try {
-    const classes = await Class.find().populate("schoolId", "name");
-    res.status(200).json(classes);
+    const classes = await Class.find();
+    const classData = classes.map((classData) => ({
+      id: classData._id,
+      name: classData.name,
+      description: classData.description,
+      status: classData.status,
+    }));
+    res.status(200).json({
+      message: "Classes retrieved successfully",
+      data: classData,
+    });
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
@@ -33,14 +43,20 @@ export const getClasses = async (req, res) => {
 
 export const getClassById = async (req, res) => {
   try {
-    const classData = await Class.findById(req.params.id).populate(
-      "schoolId",
-      "name",
-    );
+    const classData = await Class.findById(req.params.id);
+    const responseData = {
+      id: classData._id,
+      name: classData.name,
+      description: classData.description,
+      status: classData.status,
+    };
     if (!classData) {
       return res.status(404).json({ message: "Class not found" });
     }
-    res.status(200).json(classData);
+    res.status(200).json({
+      message: "Class retrieved successfully",
+      data: responseData,
+    });
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
@@ -65,7 +81,16 @@ export const updateClass = async (req, res) => {
     if (!updatedClass) {
       return res.status(404).json({ message: "Class not found" });
     }
-    res.status(200).json(updatedClass);
+    const responseData = {
+      id: updatedClass._id,
+      name: updatedClass.name,
+      description: updatedClass.description,
+      status: updatedClass.status,
+    };
+    res.status(200).json({
+      message: "Class updated successfully",
+      data: responseData,
+    });
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
