@@ -24,8 +24,18 @@ export const createMedium = async (req, res) => {
 
 export const getMediums = async (req, res) => {
   try {
-    const mediums = await Medium.find().populate("schoolId", "name");
-    res.status(200).json(mediums);
+    const mediums = await Medium.find();
+    const mediumsData = mediums.map((medium) => ({
+      id: medium._id,
+      name: medium.name,
+      status: medium.status,
+    }));
+    res.status(200).json(
+      {
+        message: "Mediums retrieved successfully",
+        data: mediumsData,
+      }
+    );
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
@@ -33,14 +43,21 @@ export const getMediums = async (req, res) => {
 
 export const getMediumById = async (req, res) => {
   try {
-    const medium = await Medium.findById(req.params.id).populate(
-      "schoolId",
-      "name",
-    );
+    const medium = await Medium.findById(req.params.id);
+    const mediumData = {
+      id: medium._id,
+      name: medium.name,
+      status: medium.status,
+    };
     if (!medium) {
       return res.status(404).json({ message: "Medium not found" });
     }
-    res.status(200).json(medium);
+    res.status(200).json(
+      {
+        message: "Medium retrieved successfully",
+        data: mediumData,
+      }
+    );
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
@@ -65,7 +82,17 @@ export const updateMedium = async (req, res) => {
     if (!updatedMedium) {
       return res.status(404).json({ message: "Medium not found" });
     }
-    res.status(200).json(updatedMedium);
+    const updatedMediumData = {
+      id: updatedMedium._id,
+      name: updatedMedium.name,
+      status: updatedMedium.status,
+    };
+    res.status(200).json(
+      {
+        message: "Medium updated successfully",
+        data: updatedMediumData,
+      }
+    );
   } catch (error) {
     res.status(500).json({ message: error.message });
   }

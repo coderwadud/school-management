@@ -4,7 +4,7 @@ import School from "../../models/academic/SchoolModel.js";
 export const createGroup = async (req, res) => {
   try {
     const schoolId = req.schoolId;
-    const { name, status } = req.body;
+    const { name, description, status } = req.body;
     // Check if the school exists
     const school = await School.findById(schoolId);
     if (!school) {
@@ -12,11 +12,17 @@ export const createGroup = async (req, res) => {
     }
     const newGroup = new Group({
       name,
+      description,
       schoolId,
       status,
     });
     const savedGroup = await newGroup.save();
-    res.status(201).json(savedGroup);
+    res.status(201).json(
+      {
+        message: "Group created successfully",
+        data: savedGroup,
+      }
+    );
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
@@ -24,8 +30,19 @@ export const createGroup = async (req, res) => {
 
 export const getGroups = async (req, res) => {
   try {
-    const groups = await Group.find().populate("schoolId", "name");
-    res.status(200).json(groups);
+    const groups = await Group.find();
+    const groupData = groups.map((group) => ({
+      id: group._id,
+      name: group.name,
+      description: group.description,
+      status: group.status,
+    }));
+    res.status(200).json(
+      {
+        message: "Groups retrieved successfully",
+        data: groupData,
+      }
+    );
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
@@ -33,14 +50,20 @@ export const getGroups = async (req, res) => {
 
 export const getGroupById = async (req, res) => {
   try {
-    const groupData = await Group.findById(req.params.id).populate(
-      "schoolId",
-      "name",
-    );
+    const groupData = await Group.findById(req.params.id);
+    const responseData = {
+      id: groupData._id,
+      name: groupData.name,
+      description: groupData.description,
+      status: groupData.status,
+    };
     if (!groupData) {
       return res.status(404).json({ message: "Group not found" });
     }
-    res.status(200).json(groupData);
+    res.status(200).json({
+      message: "Group retrieved successfully",
+      data: responseData,
+    });
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
@@ -49,7 +72,7 @@ export const getGroupById = async (req, res) => {
 export const updateGroup = async (req, res) => {
   try {
     const schoolId = req.schoolId;
-    const { name, status } = req.body;
+    const { name, description, status } = req.body;
     // Check if the school exists
     if (schoolId) {
       const school = await School.findById(schoolId);
@@ -59,13 +82,16 @@ export const updateGroup = async (req, res) => {
     }
     const updatedGroup = await Group.findByIdAndUpdate(
       req.params.id,
-      { name, schoolId, status },
+      { name, description, schoolId, status },
       { new: true },
     );
     if (!updatedGroup) {
       return res.status(404).json({ message: "Group not found" });
     }
-    res.status(200).json(updatedGroup);
+    res.status(200).json({
+      message: "Group updated successfully",
+      data: updatedGroup,
+    });
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
