@@ -74,7 +74,7 @@ export const createTeacher = async (req, res) => {
 
     res
       .status(201)
-      .json({ message: "Teacher created successfully", teacher: newTeacher });
+      .json({ message: "Teacher created successfully", data: newTeacher });
   } catch (error) {
     res
       .status(500)
@@ -85,10 +85,29 @@ export const createTeacher = async (req, res) => {
 // Get all teachers
 export const getAllTeachers = async (req, res) => {
   try {
-    const teachers = await Teacher.find().populate("schoolId");
+    const teachers = await Teacher.find();
+    const teacherData = teachers.map((teacher) => ({
+      id: teacher._id,
+      name: teacher.name,
+      email: teacher.email,
+      phone: teacher.phone,
+      nid: teacher.nid,
+      bloodGroup: teacher.bloodGroup,
+      image: teacher.image,
+      designation: teacher.designation,
+      educationQualification: teacher.educationQualification,
+      joiningDate: teacher.joiningDate,
+      dateOfBirth: teacher.dateOfBirth,
+      address: teacher.address,
+      salary: teacher.salary,
+      gender: teacher.gender,
+      religion: teacher.religion,
+      maritalStatus: teacher.maritalStatus,
+      status: teacher.status,
+    }));
     res
       .status(200)
-      .json({ message: "Teachers retrieved successfully", teachers });
+      .json({ message: "Teachers retrieved successfully", data: teacherData });
   } catch (error) {
     res
       .status(500)
@@ -100,13 +119,32 @@ export const getAllTeachers = async (req, res) => {
 export const getTeacherById = async (req, res) => {
   try {
     const { id } = req.params;
-    const teacher = await Teacher.findById(id).populate("schoolId");
+    const teacher = await Teacher.findById(id);
+    const teacherData = {
+      id: teacher._id,
+      name: teacher.name,
+      email: teacher.email,
+      phone: teacher.phone,
+      nid: teacher.nid,
+      bloodGroup: teacher.bloodGroup,
+      image: teacher.image,
+      designation: teacher.designation,
+      educationQualification: teacher.educationQualification,
+      joiningDate: teacher.joiningDate,
+      dateOfBirth: teacher.dateOfBirth,
+      address: teacher.address,
+      salary: teacher.salary,
+      gender: teacher.gender,
+      religion: teacher.religion,
+      maritalStatus: teacher.maritalStatus,
+      status: teacher.status,
+    };
     if (!teacher) {
       return res.status(404).json({ message: "Teacher not found" });
     }
     res
       .status(200)
-      .json({ message: "Teacher retrieved successfully", teacher });
+      .json({ message: "Teacher retrieved successfully", data: teacherData });
   } catch (error) {
     res
       .status(500)
@@ -212,7 +250,9 @@ export const updateTeacher = async (req, res) => {
     Object.assign(teacher, updateData);
     await teacher.save();
 
-    res.status(200).json({ message: "Teacher updated successfully", teacher });
+    res
+      .status(200)
+      .json({ message: "Teacher updated successfully", data: teacher });
   } catch (error) {
     res
       .status(500)
@@ -249,7 +289,7 @@ export const toggleTeacherStatus = async (req, res) => {
     await teacher.save();
     res
       .status(200)
-      .json({ message: "Teacher status toggled successfully", teacher });
+      .json({ message: "Teacher status toggled successfully", data: teacher });
   } catch (error) {
     res
       .status(500)
