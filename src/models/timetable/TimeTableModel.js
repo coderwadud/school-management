@@ -7,6 +7,21 @@ const timeTableSchema = new mongoose.Schema(
       ref: "Class",
       required: true,
     },
+    groupId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Group",
+      required: true,
+    },
+    mediumId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Medium",
+      required: true,
+    },
+    schoolId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "School",
+      required: true,
+    },
     sectionId: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "Section",
@@ -25,47 +40,31 @@ const timeTableSchema = new mongoose.Schema(
     dayOfWeek: {
       type: String,
       required: true,
-      enum: [
-        "Monday",
-        "Tuesday",
-        "Wednesday",
-        "Thursday",
-        "Friday",
-        "Saturday",
-        "Sunday",
-      ],
     },
-    periods: [
-      {
-        periodNumber: {
-          type: Number,
-          required: true,
-        },
-        subjectId: {
-          type: mongoose.Schema.Types.ObjectId,
-          ref: "Subject",
-        },
-        teacherId: {
-          type: mongoose.Schema.Types.ObjectId,
-          ref: "Teacher",
-        },
-        startTime: {
-          type: String,
-          required: true,
-        },
-        endTime: {
-          type: String,
-          required: true,
-        },
-        roomNumber: String,
-        periodType: {
-          type: String,
-          enum: ["Class", "Break", "Lunch", "Assembly", "Sports", "Other"],
-          default: "Class",
-        },
-        remarks: String,
-      },
-    ],
+    subjectId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Subject",
+      required: true,
+    },
+    teacherId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Teacher",
+      required: true,
+    },
+    startTime: {
+      type: String,
+      required: true,
+    },
+    endTime: {
+      type: String,
+      required: true,
+    },
+    roomNumber: {
+      type: String,
+    },
+    remarks: {
+      type: String,
+    },
     status: {
       type: Boolean,
       default: true,

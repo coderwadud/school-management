@@ -1,204 +1,240 @@
 import TimeTable from "../../models/timetable/TimeTableModel.js";
+import Class from "../../models/academic/ClassModel.js";
+import Section from "../../models/academic/SectionModel.js";
+import Subject from "../../models/academic/SubjectModel.js";
+import Teacher from "../../models/teacher/TeacherModel.js";
+import Session from "../../models/academic/SessionModel.js";
+import Shift from "../../models/academic/ShiftModel.js";
+import Group from "../../models/academic/GroupModel.js";
+import Medium from "../../models/academic/MediumModel.js";
 
 // Create time table for a class
 export const createTimeTable = async (req, res) => {
   try {
-    const timeTable = new TimeTable(req.body);
+    const {
+      classId,
+      sectionId,
+      sessionId,
+      shiftId,
+      groupId,
+      mediumId,
+      dayOfWeek,
+      subjectId,
+      teacherId,
+      startTime,
+      endTime,
+      roomNumber,
+      remarks,
+    } = req.body;
+    const schoolId = req.schoolId;
+    const timeTable = new TimeTable({
+      classId,
+      sectionId,
+      schoolId,
+      sessionId,
+      shiftId,
+      groupId,
+      mediumId,
+      dayOfWeek,
+      subjectId,
+      teacherId,
+      startTime,
+      endTime,
+      roomNumber,
+      remarks,
+    });
     await timeTable.save();
-
     res.status(201).json({
-      success: true,
       message: "Time table created successfully",
       data: timeTable,
     });
   } catch (error) {
     res.status(500).json({
-      success: false,
-      message: error.message || "Failed to create time table",
+      message: "Failed to create time table",
+      error: error.message || "Failed to create time table",
     });
   }
 };
 
-// Get time table by class and section
-export const getTimeTableByClass = async (req, res) => {
+// get time table
+export const getTimeTable = async (req, res) => {
   try {
-    const { classId, sectionId, sessionId } = req.query;
-
-    const query = { status: true };
-    if (classId) query.classId = classId;
-    if (sectionId) query.sectionId = sectionId;
-    if (sessionId) query.sessionId = sessionId;
-
-    const timeTables = await TimeTable.find(query)
+    const timeTables = await TimeTable.find()
       .populate("classId", "name")
       .populate("sectionId", "name")
       .populate("sessionId", "name")
-      .populate("shiftId", "name startTime endTime")
-      .populate("periods.subjectId", "name code")
-      .populate("periods.teacherId", "personalInformation")
-      .sort({ dayOfWeek: 1 });
-
+      .populate("shiftId", "name")
+      .populate("groupId", "name")
+      .populate("mediumId", "name")
+      .populate("subjectId", "name")
+      .populate("teacherId", "name");
+    const timeTableDAta = timeTables.map((timeTable) => {
+      return {
+        id: timeTable._id,
+        classId: timeTable.classId ? timeTable.classId.name : null,
+        sectionId: timeTable.sectionId ? timeTable.sectionId.name : null,
+        sessionId: timeTable.sessionId ? timeTable.sessionId.name : null,
+        shiftId: timeTable.shiftId ? timeTable.shiftId.name : null,
+        groupId: timeTable.groupId ? timeTable.groupId.name : null,
+        mediumId: timeTable.mediumId ? timeTable.mediumId.name : null,
+        dayOfWeek: timeTable.dayOfWeek,
+        subjectId: timeTable.subjectId ? timeTable.subjectId.name : null,
+        teacherId: timeTable.teacherId ? timeTable.teacherId.name : null,
+        startTime: timeTable.startTime,
+        endTime: timeTable.endTime,
+        roomNumber: timeTable.roomNumber,
+        remarks: timeTable.remarks,
+        status: timeTable.status,
+      };
+    });
     res.status(200).json({
-      success: true,
-      data: timeTables,
+      message: "Time table fetched successfully",
+      data: timeTableDAta,
     });
   } catch (error) {
     res.status(500).json({
-      success: false,
-      message: error.message || "Failed to fetch time table",
+      message: "Failed to get time table",
+      error: error.message || "Failed to get time table",
     });
   }
 };
 
-// Get time table by day
-export const getTimeTableByDay = async (req, res) => {
-  try {
-    const { classId, sectionId, dayOfWeek } = req.query;
-
-    const timeTable = await TimeTable.findOne({
-      classId,
-      sectionId,
-      dayOfWeek,
-      status: true,
-    })
-      .populate("classId", "name")
-      .populate("sectionId", "name")
-      .populate("periods.subjectId", "name code")
-      .populate("periods.teacherId", "personalInformation");
-
-    if (!timeTable) {
-      return res.status(404).json({
-        success: false,
-        message: "Time table not found for this day",
-      });
-    }
-
-    res.status(200).json({
-      success: true,
-      data: timeTable,
-    });
-  } catch (error) {
-    res.status(500).json({
-      success: false,
-      message: error.message || "Failed to fetch time table",
-    });
-  }
-};
-
-// Get teacher's time table
-export const getTeacherTimeTable = async (req, res) => {
-  try {
-    const { teacherId } = req.params;
-
-    const timeTables = await TimeTable.find({
-      "periods.teacherId": teacherId,
-      status: true,
-    })
-      .populate("classId", "name")
-      .populate("sectionId", "name")
-      .populate("periods.subjectId", "name code")
-      .sort({ dayOfWeek: 1 });
-
-    // Format the response to show only relevant periods for this teacher
-    const formattedTimeTables = timeTables.map((tt) => ({
-      _id: tt._id,
-      class: tt.classId,
-      section: tt.sectionId,
-      dayOfWeek: tt.dayOfWeek,
-      periods: tt.periods.filter(
-        (p) => p.teacherId && p.teacherId.toString() === teacherId,
-      ),
-    }));
-
-    res.status(200).json({
-      success: true,
-      data: formattedTimeTables,
-    });
-  } catch (error) {
-    res.status(500).json({
-      success: false,
-      message: error.message || "Failed to fetch teacher time table",
-    });
-  }
-};
-
-// Update time table
 export const updateTimeTable = async (req, res) => {
   try {
-    const timeTable = await TimeTable.findByIdAndUpdate(
-      req.params.id,
-      req.body,
-      { new: true, runValidators: true },
+    const { id } = req.params;
+    const {
+      classId,
+      sectionId,
+      sessionId,
+      shiftId,
+      groupId,
+      mediumId,
+      dayOfWeek,
+      subjectId,
+      teacherId,
+      startTime,
+      endTime,
+      roomNumber,
+      remarks,
+      status,
+    } = req.body;
+    const schoolId = req.schoolId;
+    const updatedTimeTable = await TimeTable.findByIdAndUpdate(
+      id,
+      {
+        classId,
+        sectionId,
+        schoolId,
+        sessionId,
+        shiftId,
+        groupId,
+        mediumId,
+        dayOfWeek,
+        subjectId,
+        teacherId,
+        startTime,
+        endTime,
+        roomNumber,
+        remarks,
+        status,
+      },
+      { new: true }
     );
-
-    if (!timeTable) {
-      return res.status(404).json({
-        success: false,
-        message: "Time table not found",
-      });
+    if (!updatedTimeTable) {
+      return res.status(404).json({ message: "Time table not found" });
     }
-
     res.status(200).json({
-      success: true,
       message: "Time table updated successfully",
-      data: timeTable,
+      data: updatedTimeTable,
     });
   } catch (error) {
     res.status(500).json({
-      success: false,
-      message: error.message || "Failed to update time table",
+      message: "Failed to update time table",
+      error: error.message || "Failed to update time table",
     });
   }
 };
 
-// Delete time table
+export const getTimeTableById = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const timeTable = await TimeTable.findById(id)
+      .populate("classId", "_id")
+      .populate("sectionId", "_id")
+      .populate("sessionId", "_id")
+      .populate("shiftId", "_id")
+      .populate("groupId", "_id")
+      .populate("mediumId", "_id")
+      .populate("subjectId", "_id")
+      .populate("teacherId", "_id");
+      const formattedTimeTable = {
+        id: timeTable._id,
+        classId: timeTable.classId ? timeTable.classId._id : null,
+        sectionId: timeTable.sectionId ? timeTable.sectionId._id : null,
+        sessionId: timeTable.sessionId ? timeTable.sessionId._id : null,
+        shiftId: timeTable.shiftId ? timeTable.shiftId._id : null,
+        groupId: timeTable.groupId ? timeTable.groupId._id : null,
+        mediumId: timeTable.mediumId ? timeTable.mediumId._id : null,
+        subjectId: timeTable.subjectId ? timeTable.subjectId._id : null,
+        teacherId: timeTable.teacherId ? timeTable.teacherId._id : null,
+        dayOfWeek: timeTable.dayOfWeek,
+        startTime: timeTable.startTime,
+        endTime: timeTable.endTime,
+        roomNumber: timeTable.roomNumber,
+        remarks: timeTable.remarks,
+        status: timeTable.status,
+      };
+    if (!timeTable) {
+      return res.status(404).json({ message: "Time table not found" });
+    }
+    res.status(200).json({
+      message: "Time table fetched successfully",
+      data: formattedTimeTable,
+    });
+  } catch (error) {
+    res.status(500).json({
+      message: "Failed to get time table",
+      error: error.message || "Failed to get time table",
+    });
+  }
+};
+
 export const deleteTimeTable = async (req, res) => {
   try {
-    const timeTable = await TimeTable.findByIdAndDelete(req.params.id);
-
-    if (!timeTable) {
-      return res.status(404).json({
-        success: false,
-        message: "Time table not found",
-      });
+    const { id } = req.params;
+    const deletedTimeTable = await TimeTable.findByIdAndDelete(id);
+    if (!deletedTimeTable) {
+      return res.status(404).json({ message: "Time table not found" });
     }
-
     res.status(200).json({
-      success: true,
       message: "Time table deleted successfully",
+      data: deletedTimeTable,
     });
   } catch (error) {
     res.status(500).json({
-      success: false,
-      message: error.message || "Failed to delete time table",
+      message: "Failed to delete time table",
+      error: error.message || "Failed to delete time table",
     });
   }
 };
 
-// Toggle time table status
 export const toggleTimeTableStatus = async (req, res) => {
   try {
-    const timeTable = await TimeTable.findById(req.params.id);
-
+    const { id } = req.params;
+    const timeTable = await TimeTable.findById(id);
     if (!timeTable) {
-      return res.status(404).json({
-        success: false,
-        message: "Time table not found",
-      });
+      return res.status(404).json({ message: "Time table not found" });
     }
-
     timeTable.status = !timeTable.status;
     await timeTable.save();
-
     res.status(200).json({
-      success: true,
-      message: "Time table status updated successfully",
+      message: "Time table status toggled successfully",
       data: timeTable,
     });
   } catch (error) {
     res.status(500).json({
-      success: false,
-      message: error.message || "Failed to update time table status",
+      message: "Failed to toggle time table status",
+      error: error.message || "Failed to toggle time table status",
     });
   }
 };

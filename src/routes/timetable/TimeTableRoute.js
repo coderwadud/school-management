@@ -1,9 +1,8 @@
 import {
   createTimeTable,
-  getTimeTableByClass,
-  getTimeTableByDay,
-  getTeacherTimeTable,
+  getTimeTable,
   updateTimeTable,
+  getTimeTableById,
   deleteTimeTable,
   toggleTimeTableStatus,
 } from "../../controllers/timetable/TimeTableController.js";
@@ -13,9 +12,8 @@ import { authenticate } from "../../middleware/authMiddleware.js";
 const router = express.Router();
 
 router.post("/", authenticate, createTimeTable);
-router.get("/", authenticate, getTimeTableByClass);
-router.get("/day", authenticate, getTimeTableByDay);
-router.get("/teacher/:teacherId", authenticate, getTeacherTimeTable);
+router.get("/", getTimeTable);
+router.get("/:id", authenticate, getTimeTableById);
 router.put("/:id", authenticate, updateTimeTable);
 router.delete("/:id", authenticate, deleteTimeTable);
 router.patch("/:id/status", authenticate, toggleTimeTableStatus);
